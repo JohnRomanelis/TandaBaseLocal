@@ -1,4 +1,4 @@
-import { Heart, Pencil, PlayCircle } from "lucide-react";
+import { Heart, Pencil, PlayCircle, Ban } from "lucide-react";
 
 interface Song {
   id: number;
@@ -44,7 +44,15 @@ export default function SongRow({
     >
       {/* ▶️ Play Icon (just for visual) */}
       <td className="px-4 py-4">
-        <PlayCircle className="h-5 w-5 text-white" />
+        {song.spotify_id ? (
+          <button onClick={onPlay} title="Play">
+            <PlayCircle className="h-5 w-5 text-white hover:text-red-500" />
+          </button>
+        ) : (
+          <span title="Unavailable">
+            <Ban className="h-5 w-5 text-gray-600" />
+          </span>
+        )}
       </td>
 
       {/* 🎵 Title */}
