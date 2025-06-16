@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const unidecode = require("unidecode");
+
 
 router.get("/", (req, res) => {
   const {
@@ -92,6 +94,97 @@ router.get("/", (req, res) => {
   } catch (err) {
     console.error("Error querying songs:", err);
     res.status(500).json({ error: "Failed to query songs" });
+  }
+});
+
+// utilities – could be in a separate file
+const getOrCreateOrchestra = (name, tx) => {
+  const row = tx.prepare("SELECT id FROM ORCHESTRA WHERE name = ?").get(name);
+  if (row) return row.id;
+  const info = tx.prepare(
+    "INSERT INTO ORCHESTRA (name, is_modern, verified) VALUES (?, 0, 0)"
+  ).run(name);
+  return info.lastInsertRowid;
+};
+
+const getOrCreateSinger = (name, tx) => {
+  const row = tx.prepare("SELECT id FROM SINGER WHERE name = ?").get(name);
+  if (row) return row.id;
+  const info = tx.prepare(
+    "INSERT INTO SINGER (name, verified) VALUES (?, 0)"
+  ).run(name);
+  return info.lastInsertRowid;
+};
+
+// ---------------------------------------------
+// PUT /api/songs/:id  – update one song
+// ---------------------------------------------
+router.put("/:id", (req, res) => {
+  const { id } = req.params;
+  const {
+    title,
+    type,
+    style,
+    recording_year,
+    is_instrumental,
+    spotify_id,
+    duration,
+    orchestra,
+    singers = [],
+    verified = false,
+  } = req.body;
+
+  try {
+    db.transaction(() => {
+      /* 1. orchestra → id */
+      const orchestraId = getOrCreateOrchestra(orchestra, db);
+
+      /* 2. update SONG core */
+      db.prepare(
+        `UPDATE SONG
+           SET title            = ?,
+               english_title    = ?,
+               type             = ?,
+               style            = ?,
+               recording_year   = ?,
+               is_instrumental  = ?,
+               spotify_id       = ?,
+               duration         = ?,
+               orchestra_id     = ?,
+               verified         = ?
+         WHERE id = ?`
+      ).run(
+        title,
+        unidecode(title), 
+        type,
+        style,
+        recording_year || null,
+        is_instrumental ? 1 : 0,
+        spotify_id || null,
+        duration || null,
+        orchestraId,
+        verified ? 1 : 0,
+        id
+      );
+
+      /* 3. refresh singer links */
+      db.prepare("DELETE FROM SONG_SINGER WHERE song_id = ?").run(id);
+
+      if (!is_instrumental && singers.length) {
+        const link = db.prepare(
+          "INSERT INTO SONG_SINGER (song_id, singer_id) VALUES (?, ?)"
+        );
+        singers.forEach((name) => {
+          const singerId = getOrCreateSinger(name.trim(), db);
+          link.run(id, singerId);
+        });
+      }
+    })();
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ error: "Failed to update song" });
   }
 });
 

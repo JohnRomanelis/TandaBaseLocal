@@ -5,6 +5,8 @@ interface Props {
   placeholder: string;
   apiPath: string;
   onSelect: (value: string) => void;
+  /* Optional starting text */
+  initialValue?: string;
 }
 
 export default function AutoSuggestInput({
@@ -12,15 +14,29 @@ export default function AutoSuggestInput({
   placeholder,
   apiPath,
   onSelect,
+  initialValue = "",  // default to empty string if not provided
 }: Props) {
   /* ---------- state ---------- */
-  const [query, setQuery]          = useState("");
+  const [query, setQuery]          = useState(initialValue ?? "");
   const [suggestions, setSug]      = useState<string[]>([]);
   const [open, setOpen]            = useState(false);
-  const [skipFetch, setSkipFetch]  = useState(false);   // ★ NEW
+  const [skipFetch, setSkipFetch]  = useState(!!initialValue);   // ★ NEW
   const inputRef = useRef<HTMLInputElement>(null);
 
   /* ---------- debounced fetch ---------- */
+  useEffect(() => {
+    // Run only if component mounts OR parent changes initialValue
+    // *and* the user has not typed (query is still empty)
+    if (initialValue && query === "") {
+      setQuery(initialValue);
+      setSkipFetch(true);   // block fetch until first keystroke
+      setSug([]);
+      setOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValue]);
+
+
   useEffect(() => {
     if (skipFetch) return;                            // ★ block while true
 

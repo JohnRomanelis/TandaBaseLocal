@@ -7,6 +7,9 @@ const suggestionsRoutes = require("./routes/suggestions.js");
 
 
 const app = express();
+
+app.use(express.json());
+
 const PORT = 3000;
 
 app.use(cors());
