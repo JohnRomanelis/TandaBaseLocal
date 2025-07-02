@@ -20,7 +20,7 @@ Before you can run TandaBase, you’ll need to install:
 
 ## 📦 Step 1: Download TandaBase
 
-1. Go to the GitHub page: [github.com/YOUR\_USERNAME/TandaBase](https://github.com/YOUR_USERNAME/TandaBase)
+1. Go to the GitHub page: [https://github.com/JohnRomanelis/TandaBaseLocal.git](https://github.com/YOUR_USERNAME/TandaBase)
 2. Click the green **"Code"** button.
 3. Select **"Download ZIP"**.
 4. Extract the downloaded file to a folder on your computer.
@@ -41,7 +41,37 @@ Before you can run TandaBase, you’ll need to install:
 
 ## 🚀 Step 3: Run TandaBase
 
-### 🖥️ Option A: Use VS Code
+### 🖥️ Option A (Recommended):
+
+Open a terminal or command prompt and run the following commands depending on your operating system:
+
+**One-click startup scripts** that automatically start both server and client, plus open your browser:
+
+**macOS:**
+```bash
+./start-dev.sh          # Terminal
+./start-dev-iterm.sh     # iTerm2
+```
+
+**Linux/Ubuntu:**
+```bash
+./start-dev-linux.sh    # Auto-detects terminal (GNOME, KDE, XFCE, etc.)
+```
+
+**Windows:**
+```cmd
+start-dev.bat
+```
+
+**Cross-platform:**
+```bash
+npm run dev             # Single terminal with colored output
+```
+
+> These scripts will automatically install dependencies, start both services, and open http://localhost:5173 in your browser.
+
+
+### 🖥️ Option B: Use VS Code
 
 1. Open the TandaBase folder in VS Code.
 
@@ -69,7 +99,7 @@ npm run dev
 
 > ✅ This will start the frontend at [http://localhost:5173](http://localhost:5173)
 
-### 🖥️ Option B: Without VS Code
+### 🖥️ Option C: Without VS Code
 
 1. Open a terminal or command prompt manually.
 2. Navigate to the project folder:
