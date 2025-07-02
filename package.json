@@ -1,0 +1,19 @@
+{
+  "name": "tandabase-local",
+  "version": "1.0.0",
+  "description": "TandaBase Local Development Environment",
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\" \"npm run open:browser\"",
+    "dev:server": "cd server && npm start",
+    "dev:client": "cd client && npm run dev",
+    "open:browser": "sleep 8 && (command -v open >/dev/null && open http://localhost:5173) || (command -v xdg-open >/dev/null && xdg-open http://localhost:5173) || (command -v start >/dev/null && start http://localhost:5173) || echo '🌐 Please open http://localhost:5173 in your browser'",
+    "start": "npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "keywords": ["tango", "music", "database"],
+  "author": "",
+  "license": "ISC"
+}
